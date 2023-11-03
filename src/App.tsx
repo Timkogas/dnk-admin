@@ -8,12 +8,12 @@ import instance from './axiosInstance';
 const App = observer(() => {
   const [login, setLogin] = useState<boolean>(false)
   const token = State.getUser().token
+  const [notificationText, setNotificationText] = useState<string>("");
 
 
   useEffect(() => {
     const check = async () => {
       const data = await instance.post('/admin/check')
-      console.log(data.data)
       if (data.data.error === false) {
         setLogin(true)
       } else {
@@ -23,6 +23,17 @@ const App = observer(() => {
 
     check()
   }, [token])
+
+  const handleSendNotification = async () => {
+    try {
+      const response = await instance.post('/admin/notification', {
+        text: notificationText
+      });
+      console.log('Notification sent successfully:', response.data);
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  };
 
 
   return (
@@ -39,8 +50,9 @@ const App = observer(() => {
           multiline
           rows={6}
           maxRows={6}
+          onChange={(e) => setNotificationText(e.target.value)}
         />
-        <Button variant="contained" color="primary" sx={{ marginTop: '10px' }}>Отправить</Button>
+        <Button variant="contained" color="primary" sx={{ marginTop: '10px' }} onClick={handleSendNotification}>Отправить</Button>
       </Box> : <Login />}
 
     </div>
